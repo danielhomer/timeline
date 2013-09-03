@@ -3,7 +3,7 @@
 Plugin Name: Timeline
 Plugin URI: http://danielhomer.me/plugins/timeline
 Description: Include a timeline of your most recent online activity directly on your blog!
-Version: 0.1
+Version: 0.2
 Author: Daniel Homer
 Author URI: http://danielhomer.me
 License: GPL2
@@ -146,94 +146,33 @@ class Timeline {
 	}
 
 	public static function pageContent()
-	{ ?>
+	{ 
+		$posts = TimelinePost::all();
+		?>
+
 		<div class="wrap" id="container">
 			<h2>Timeline</h2>
 
 			<ol id="timeline">
-				<li class="timeline-item github latest">
-					<div class="left-margin">
-						<img src="<?php echo TIMELINE_PLUGIN_URI ?>/images/github-32.png" alt="GitHub logo" />
-					</div>
-					<div class="right-margin">
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-						<p class="byline"><span id="datetime">04/01/2013 15:21:02</span> via <a href="#" class="vialink">GitHub</a></p>
-					</div>
-				</li>
-				<li class="timeline-item facebook">
-					<div class="left-margin">
-						<img src="<?php echo TIMELINE_PLUGIN_URI ?>/images/facebook-32.png" alt="GitHub logo" />
-					</div>
-					<div class="right-margin">
-						<p>Lorem ipsum dolor sit amet, consectetur.</p>
-						<p class="byline"><span id="datetime">04/01/2013 15:21:02</span> via <a href="#" class="vialink">Facebook</a></p>
-					</div>
-				</li>
-				<li class="timeline-item digg">
-					<div class="left-margin">
-						<img src="<?php echo TIMELINE_PLUGIN_URI ?>/images/digg-32.png" alt="GitHub logo" />
-					</div>
-					<div class="right-margin">
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-						<p class="byline"><span id="datetime">04/01/2013 15:21:02</span> via <a href="#" class="vialink">Digg</a></p>
-					</div>
-				</li>
-				<li class="timeline-item twitter">
-					<div class="left-margin">
-						<img src="<?php echo TIMELINE_PLUGIN_URI ?>/images/twitter-32.png" alt="GitHub logo" />
-					</div>
-					<div class="right-margin">
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-						<p class="byline"><span id="datetime">04/01/2013 15:21:02</span> via <a href="#" class="vialink">Twitter</a></p>
-					</div>
-				</li>
-				<li class="timeline-item blogger">
-					<div class="left-margin">
-						<img src="<?php echo TIMELINE_PLUGIN_URI ?>/images/blogger-32.png" alt="GitHub logo" />
-					</div>
-					<div class="right-margin">
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-						<p class="byline"><span id="datetime">04/01/2013 15:21:02</span> via <a href="#" class="vialink">Blogger</a></p>
-					</div>
-				</li>
-				<li class="timeline-item github">
-					<div class="left-margin">
-						<img src="<?php echo TIMELINE_PLUGIN_URI ?>/images/github-32.png" alt="GitHub logo" />
-					</div>
-					<div class="right-margin">
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-						<p class="byline"><span id="datetime">04/01/2013 15:21:02</span> via <a href="#" class="vialink">GitHub</a></p>
-					</div>
-				</li>
-				<li class="timeline-item facebook">
-					<div class="left-margin">
-						<img src="<?php echo TIMELINE_PLUGIN_URI ?>/images/facebook-32.png" alt="GitHub logo" />
-					</div>
-					<div class="right-margin">
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-						<p class="byline"><span id="datetime">04/01/2013 15:21:02</span> via <a href="#" class="vialink">Facebook</a></p>
-					</div>
-				</li>
-				<li class="timeline-item digg">
-					<div class="left-margin">
-						<img src="<?php echo TIMELINE_PLUGIN_URI ?>/images/digg-32.png" alt="GitHub logo" />
-					</div>
-					<div class="right-margin">
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-						<p class="byline"><span id="datetime">04/01/2013 15:21:02</span> via <a href="#" class="vialink">Digg</a></p>
-					</div>
-				</li>
-				<li class="timeline-item blogger">
-					<div class="left-margin">
-						<img src="<?php echo TIMELINE_PLUGIN_URI ?>/images/blogger-32.png" alt="GitHub logo" />
-					</div>
-					<div class="right-margin">
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-						<p class="byline"><span id="datetime">04/01/2013 15:21:02</span> via <a href="#" class="vialink">Blogger</a></p>
-					</div>
-				</li>
+
+			<?php
+			if ( $posts ) {
+				foreach ( $posts as $post ) { ?>
+					<li class="timeline-item <?php echo $post->service ?> latest">
+						<div class="left-margin">
+							<img src="<?php echo TIMELINE_PLUGIN_URI ?>/images/<?php echo $post->service ?>-32.png" alt="GitHub logo" />
+						</div>
+						<div class="right-margin">
+							<p><?php echo $post->content ?></p>
+							<p class="byline"><span id="datetime"><?php echo date( 'd/m/y H:i:s', $post->time ) ?></span> via <a href="#" class="vialink"><?php echo $post->service ?></a></p>
+						</div>
+					</li>
+				<?php }
+			} ?>
+
 			</ol>
 		</div>
+
 	<?php }
 
 	public static function settingsPageContent()

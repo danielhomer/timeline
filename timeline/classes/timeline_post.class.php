@@ -16,6 +16,13 @@ class TimelinePost {
 		$this->posts_table = $wpdb->prefix . 'timeline';
 	}
 
+	public static function all()
+	{
+		global $wpdb;
+		$posts_table = $wpdb->prefix . 'timeline';
+		return $wpdb->get_results( "SELECT * FROM $posts_table ORDER BY time DESC" );
+	}
+
 	public static function get( $id, $column = "service_id" )
 	{
 		global $wpdb;
