@@ -24,24 +24,24 @@ html {
 	color: #333;
 }
 
-#timeline li {
-	display: inline-block;
-	width: 100%;
-	clear: both;
-	margin: 15px 0;
-}
-
 #timeline p {
 	margin: 0;
 }
 
 #timeline .latest {
-	margin: 0 0 20px 0;
+	margin-top: 0px;
 }
 
 #timeline li .right-margin p.byline {
 	margin-top: 0.7em;
 	font-size: 0.85em;
+}
+
+.timeline-item {
+	display: inline-block;
+	width: 100%;
+	clear: both;
+	margin: 10px 0;
 }
 
 .timeline-item img {
@@ -88,6 +88,19 @@ html {
 	color: #aaaaaa;
 }
 
+.timeline-item .byline .hide-button {
+	float: right;
+}
+
+.timeline-item .byline .hide-button:hover {
+	cursor: pointer;
+}
+
+.timeline-item.hidden {
+	margin: 10px 0 10px 48px;
+	opacity: 0.5;
+}
+
 .timeline-item.github:hover img {
 	background-color: #4183C4;
 }
@@ -106,6 +119,10 @@ html {
 
 .timeline-item.twitter:hover img {
 	background-color: #00ACED;
+}
+
+.timeline-item.wordpress:hover img {
+	background-color: #21759B;
 }
 
 @media all and (max-width: 530px) {

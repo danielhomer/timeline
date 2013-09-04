@@ -24,7 +24,7 @@ class GitHub extends TimelineService {
 				return false;
 
 			$timelinePost = new TimelinePost();
-			$timelinePost->service = "github";
+			$timelinePost->service = "GitHub";
 			$timelinePost->serviceID = $event->id;
 			$timelinePost->content = $this->getContent( $event );
 			$timelinePost->time = strtotime( $event->created_at );
@@ -55,15 +55,15 @@ class GitHub extends TimelineService {
 					return 'Created repository <a href="' . $this->home_url . $event->repo->name . '">' . $event->repo->name . '</a>';
 
 				if ( $event->payload->ref_type == 'branch' )
-					return 'Created a branch of <a href="' . $this->home_url . $event->repo->name . '">' . $event->repo->name . '</a> called ' . $event->payload->ref;
+					return 'Created branch <code>' . $event->payload->ref . '</code> on <a href="' . $this->home_url . $event->repo->name . '">' . $event->repo->name . '</a>.';
 				break;
 
 			case 'DeleteEvent':
 				if ( $event->payload->ref_type == 'branch' )
-					return 'Deleted branch ' . $event->payload->ref;
+					return 'Deleted branch <code>' . $event->payload->ref . '</code>';
 
 				if ( $event->payload->ref_type == 'tag' )
-					return 'Deleted tag ' . $event->payload->ref;
+					return 'Deleted tag <code>' . $event->payload->ref . '</code>';
 				break;
 
 			case 'DownloadEvent':
@@ -90,7 +90,7 @@ class GitHub extends TimelineService {
 				if ( $event->payload->action == 'opened' )
 					return 'Opened a new <a href="' . $event->payload->issue->url . '">Issue</a>';
 
-				if ( $event->payload->action == 'cloased' )
+				if ( $event->payload->action == 'closed' )
 					return 'Closed an <a href="' . $event->payload->issue->url . '">Issue</a>';
 
 				if ( $event->payload->action == 'reopened' )
@@ -103,7 +103,7 @@ class GitHub extends TimelineService {
 				break;
 
 			case 'PushEvent':
-				return 'Pushed ' . $event->payload->head . ' to <a href="' . $this->home_url . $event->repo->name . '">' . $event->repo->name . '</a> on branch ' . $event->payload->ref;
+				return 'Pushed <code>' . $event->payload->head . '</code> to <a href="' . $this->home_url . $event->repo->name . '">' . $event->repo->name . '</a> on branch <code>' . $event->payload->ref . '</code>';
 				break;
 
 			case 'WatchEvent':

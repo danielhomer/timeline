@@ -30,6 +30,27 @@ class TimelinePost {
 		return $wpdb->query( $wpdb->prepare( "SELECT * FROM $posts_table WHERE service_id = %s", $id ) );
 	}
 
+	public static function delete( $id, $column = 'id' )
+	{
+		global $wpdb;
+		$posts_table = $wpdb->prefix . 'timeline';
+		return $wpdb->delete( $posts_table, array( $column => $id ) );
+	}
+
+	public static function hide( $id, $column = 'id' )
+	{
+		global $wpdb;
+		$posts_table = $wpdb->prefix . 'timeline';
+		return $wpdb->update( $posts_table, array( 'hidden' => 1 ), array( $column => $id ), array( '%d' ) );
+	}
+
+	public static function unhide( $id, $column = 'id' )
+	{
+		global $wpdb;
+		$posts_table = $wpdb->prefix . 'timeline';
+		return $wpdb->update( $posts_table, array( 'hidden' => 0 ), array( $column => $id ), array( '%d' ) );
+	}
+
 	public function save()
 	{
 		global $wpdb;

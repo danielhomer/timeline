@@ -22,12 +22,13 @@ register_deactivation_hook( __FILE__, array( 'Timeline', 'uninstall' ) );
 
 add_action( 'init', array( 'Timeline', 'run' ) );
 add_action( 'admin_menu', array( 'Timeline', 'addMenus' ) );
+add_action( 'wp_ajax_get_response', array( 'Timeline', 'ajaxResponse' ) );
 
 class Timeline {
 
 	public static $active_providers;
 	public static $available_providers = array(
-		'twitter', 'facebook', 'github'
+		'twitter', 'facebook', 'github', 'wordpress'
 		);
 
 	public static function install()
@@ -63,17 +64,97 @@ class Timeline {
 	{
 		self::$active_providers = get_option( 'timeline_option_providers' );
 
+		if ( self::$active_providers['wordpress'] ) {
+			add_action( 'publish_post', array( 'WordPress', 'add' ) );
+			add_action( 'wp_trash_post', array( 'WordPress', 'trash' ) );
+			add_action( 'untrashed_post', array( 'WordPress', 'untrash' ) );
+			add_action( 'before_delete_post', array( 'WordPress', 'delete' ) );
+		}
+
 		if ( get_transient( 'timeline_wait' ) )
 			return false;
 
 		foreach ( self::$active_providers as $provider => $enabled ) {
-			if ( $enabled ) {
+			if ( $enabled && $provider != 'wordpress' ) {
 				$$provider = new $provider();
 				$$provider = $$provider->sync();
 			}
 		}
 
-		set_transient( 'timeline_wait', true, 10 );
+		set_transient( 'timeline_wait', true, 60*5 );
+	}
+
+	public static function ajaxResponse()
+	{
+		$timeline_action = isset( $_POST['timeline_action'] ) ? $_POST['timeline_action'] : false;
+		$timeline_params = isset( $_POST['timeline_params'] ) ? $_POST['timeline_params'] : false;
+		$errors = array();
+		$results = array();
+
+		if ( ! $timeline_action )
+			$errors[] = "No action specified";
+
+		if ( ! current_user_can( 'activate_plugins' ) ) {
+			$errors[] = "Permission denied";
+		} else if ( ! is_user_logged_in() ) {
+			$errors[] = "User not logged in";
+		}
+
+		if ( ! empty( $errors ) )
+			self::ajaxError( $errors );
+
+		switch( $timeline_action ) {
+			case 'hide_post':
+				$status = "OK";
+				$results = self::ajaxHide( $timeline_params );
+				break;
+
+			case 'unhide_post':
+				$status = "OK";
+				$results = self::ajaxUnhide( $timeline_params );
+				break;
+
+			default:
+				$status = "ERROR";
+				$errors[] = "Unknown action";
+				break;
+		}
+
+		if ( $status == "ERROR" )
+			self::ajaxError( $errors );
+
+		$response = array(
+			'status' => $status,
+			'results' => $results
+			);
+		echo json_encode( $response );
+		die();
+	}
+
+	public static function ajaxError( $errors )
+	{
+		$response = array(
+			'status' => 'ERROR',
+			'errors' => $errors
+			);
+		echo json_encode( $response );
+		die();
+	}
+
+	public static function ajaxHide( $params )
+	{
+		if ( ! is_array( $params ) || ! array_key_exists( 'id', $params ) )
+			return false;
+
+		return TimelinePost::hide( $params['id'] );
+	}
+
+		public static function ajaxUnhide( $params )
+	{
+		if ( ! is_array( $params ) || ! array_key_exists( 'id', $params ) )
+			return false;
+
+		return TimelinePost::unhide( $params['id'] );
 	}
 
 	public static function addMenus()
@@ -157,17 +238,23 @@ class Timeline {
 
 			<?php
 			if ( $posts ) {
-				foreach ( $posts as $post ) { ?>
-					<li class="timeline-item <?php echo $post->service ?> latest">
-						<div class="left-margin">
-							<img src="<?php echo TIMELINE_PLUGIN_URI ?>/images/<?php echo $post->service ?>-32.png" alt="GitHub logo" />
-						</div>
-						<div class="right-margin">
-							<p><?php echo $post->content ?></p>
-							<p class="byline"><span id="datetime"><?php echo date( 'd/m/y H:i:s', $post->time ) ?></span> via <a href="#" class="vialink"><?php echo $post->service ?></a></p>
-						</div>
-					</li>
-				<?php }
+				$i = 0;
+				foreach ( $posts as $post ) { 
+					?>
+						<li class="timeline-item <?php echo strtolower( $post->service ); echo $post->hidden ? ' hidden' : ''; echo $i == 0 ? ' latest' : ''; ?>">
+							<div class="left-margin">
+								<img src="<?php echo TIMELINE_PLUGIN_URI ?>/images/<?php echo strtolower( $post->service ) ?>-32.png" alt="<?php echo $post->service ?> logo" />
+							</div>
+							<div class="right-margin">
+								<p class="content"><?php echo $post->content ?></p>
+								<p class="byline"><span id="datetime"><?php echo date( 'd/m/y H:i:s', $post->time ) ?></span> via <a href="#" class="vialink"><?php echo $post->service ?></a>
+									<?php if ( strtolower( $post->service ) != 'wordpress' ) : ?><a id="hide-<?php echo $post->id ?>" class="hide-button"><?php echo $post->hidden ? 'unhide' : 'hide' ?></a><?php endif; ?>
+								</p>
+							</div>
+						</li>
+				<?php 
+					$i++;
+				}
 			} ?>
 
 			</ol>
@@ -179,6 +266,9 @@ class Timeline {
 	{ 
 		if ( isset( $_POST['page'] ) && $_POST['page'] == 'timeline_settings' )
 			self::saveSettings( $_POST );
+
+		if ( get_transient( 'timeline_wait' ) )
+			delete_transient( 'timeline_wait' );
 
 		$timeline_option_providers = self::$active_providers;
 		?>
@@ -218,6 +308,10 @@ class Timeline {
 
 				<input type="hidden" name="page" value="timeline_settings" />
 				<p class="submit"><input type="submit" name="submit" id="submit" class="button button-primary" value="Save Changes"></p>
+			
+				<!--WordPress-->
+				<label for="timeline_option_providers[wordpress]">WordPress</label>
+				<input type="checkbox" name="timeline_option_providers[wordpress]" value="1" <?php checked( $timeline_option_providers['wordpress'] ) ?> />				
 			</form>
 	<?php }
 

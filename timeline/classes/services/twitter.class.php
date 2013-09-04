@@ -39,7 +39,7 @@ class Twitter extends TimelineService {
 				return false;
 
 			$timelinePost = new TimelinePost();
-			$timelinePost->service = "twitter";
+			$timelinePost->service = "Twitter";
 			$timelinePost->serviceID = $tweet->id_str;
 			$timelinePost->content = $tweet->text;
 			$timelinePost->time = strtotime( $tweet->created_at );
