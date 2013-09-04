@@ -90,7 +90,7 @@ class GitHub extends TimelineService {
 				if ( $event->payload->action == 'opened' )
 					return 'Opened a new <a href="' . $event->payload->issue->url . '">Issue</a>';
 
-				if ( $event->payload->action == 'cloased' )
+				if ( $event->payload->action == 'closed' )
 					return 'Closed an <a href="' . $event->payload->issue->url . '">Issue</a>';
 
 				if ( $event->payload->action == 'reopened' )
