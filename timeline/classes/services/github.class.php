@@ -86,6 +86,13 @@ class GitHub extends TimelineService {
 					return 'Updated a <a href="'. $event->payload->gist->url . '">Gist</a>';
 				break;
 
+			case 'GollumEvent':
+				$page_list = '';
+				foreach ( $event->payload->pages as $page )
+					$page_list .= '<li>' . ucfirst( $page->action ) . ' page: <a href="' . $page->html_url . '">' . $page->title . '</a></li>';
+				return '<ul>' . $page_list . '</ul>';
+				break;
+
 			case 'IssuesEvent':
 				if ( $event->payload->action == 'opened' )
 					return 'Opened a new <a href="' . $event->payload->issue->url . '">Issue</a>';

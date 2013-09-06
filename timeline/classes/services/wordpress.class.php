@@ -2,11 +2,6 @@
 
 class WordPress extends TimelineService {
 
-	public function __construct()
-	{
-
-	}
-
 	public static function add( $id )
 	{
 		if( ( $_POST['post_status'] == 'publish' ) && ( $_POST['original_post_status'] != 'publish' ) ) {

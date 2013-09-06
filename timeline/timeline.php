@@ -9,7 +9,7 @@ Author URI: http://danielhomer.me
 License: GPL2
 */
 
-define( 'TIMELINE_VERSION', '0.1' );
+define( 'TIMELINE_VERSION', '0.2' );
 define( 'TIMELINE_PLUGIN_URI', plugins_url( '', 'timeline/timeline.php' ) );
 define( 'TIMELINE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
@@ -77,7 +77,7 @@ class Timeline {
 		foreach ( self::$active_providers as $provider => $enabled ) {
 			if ( $enabled && $provider != 'wordpress' ) {
 				$$provider = new $provider();
-				$$provider = $$provider->sync();
+				$$provider->sync();
 			}
 		}
 
@@ -106,12 +106,12 @@ class Timeline {
 		switch( $timeline_action ) {
 			case 'hide_post':
 				$status = "OK";
-				$results = self::ajaxHide( $timeline_params );
+				$results['rows_updated'] = self::ajaxHide( $timeline_params );
 				break;
 
 			case 'unhide_post':
 				$status = "OK";
-				$results = self::ajaxUnhide( $timeline_params );
+				$results['rows_updated'] = self::ajaxUnhide( $timeline_params );
 				break;
 
 			default:
@@ -149,7 +149,7 @@ class Timeline {
 		return TimelinePost::hide( $params['id'] );
 	}
 
-		public static function ajaxUnhide( $params )
+	public static function ajaxUnhide( $params )
 	{
 		if ( ! is_array( $params ) || ! array_key_exists( 'id', $params ) )
 			return false;
@@ -248,7 +248,9 @@ class Timeline {
 							<div class="right-margin">
 								<p class="content"><?php echo $post->content ?></p>
 								<p class="byline"><span id="datetime"><?php echo date( 'd/m/y H:i:s', $post->time ) ?></span> via <a href="#" class="vialink"><?php echo $post->service ?></a>
-									<?php if ( strtolower( $post->service ) != 'wordpress' ) : ?><a id="hide-<?php echo $post->id ?>" class="hide-button"><?php echo $post->hidden ? 'unhide' : 'hide' ?></a><?php endif; ?>
+								<?php if ( strtolower( $post->service ) != 'wordpress' ) : ?>
+									<a data-id="<?php echo $post->id ?>" data-hidden="<?php echo $post->hidden ? 'true' : 'false' ?>" class="hide-button"><?php echo $post->hidden ? 'unhide' : 'hide' ?></a>
+								<?php endif; ?>
 								</p>
 							</div>
 						</li>
@@ -277,41 +279,63 @@ class Timeline {
 
 			<form action="" method="post">
 				<!--Twitter-->
-				<label for="timeline_option_providers[twitter]">Twitter</label>
-				<input type="checkbox" name="timeline_option_providers[twitter]" value="1" <?php checked( $timeline_option_providers['twitter'] ) ?> />
-				
-				<label for="timeline_option_twitter[username]">Username</label>
-				<input type="text" name="timeline_option_twitter[username]" value="<?php echo get_option( 'timeline_option_twitter' )['username'] ?>" />
-				
-				<label for="timeline_option_twitter[consumer_key]">Consumer Key</label>
-				<input type="text" name="timeline_option_twitter[consumer_key]" value="<?php echo get_option( 'timeline_option_twitter' )['consumer_key'] ?>" />
-				
-				<label for="timeline_option_twitter[consumer_secret]">Consumer Secret</label>
-				<input type="text" name="timeline_option_twitter[consumer_secret]" value="<?php echo get_option( 'timeline_option_twitter' )['consumer_secret'] ?>" />
-				
-				<label for="timeline_option_twitter[access_token]">Access Token</label>
-				<input type="text" name="timeline_option_twitter[access_token]" value="<?php echo get_option( 'timeline_option_twitter' )['access_token'] ?>" />
-				
-				<label for="timeline_option_twitter[access_token_secret]">Access Token Secret</label>
-				<input type="text" name="timeline_option_twitter[access_token_secret]" value="<?php echo get_option( 'timeline_option_twitter' )['access_token_secret'] ?>" />
+				<div>
+					<p>
+						<label for="timeline_option_providers[twitter]">Twitter</label>
+						<input type="checkbox" name="timeline_option_providers[twitter]" value="1" <?php checked( $timeline_option_providers['twitter'] ) ?> />
+					</p>
+					
+					<p>
+						<label for="timeline_option_twitter[username]">Username</label>
+						<input type="text" name="timeline_option_twitter[username]" value="<?php echo get_option( 'timeline_option_twitter' )['username'] ?>" />
+					</p>
+					<p>
+						<label for="timeline_option_twitter[consumer_key]">Consumer Key</label>
+						<input type="text" name="timeline_option_twitter[consumer_key]" value="<?php echo get_option( 'timeline_option_twitter' )['consumer_key'] ?>" />
+					</p>
+					<p>
+						<label for="timeline_option_twitter[consumer_secret]">Consumer Secret</label>
+						<input type="text" name="timeline_option_twitter[consumer_secret]" value="<?php echo get_option( 'timeline_option_twitter' )['consumer_secret'] ?>" />
+					</p>
+					<p>
+						<label for="timeline_option_twitter[access_token]">Access Token</label>
+						<input type="text" name="timeline_option_twitter[access_token]" value="<?php echo get_option( 'timeline_option_twitter' )['access_token'] ?>" />
+					</p>
+					<p>
+						<label for="timeline_option_twitter[access_token_secret]">Access Token Secret</label>
+						<input type="text" name="timeline_option_twitter[access_token_secret]" value="<?php echo get_option( 'timeline_option_twitter' )['access_token_secret'] ?>" />
+					</p>
+				</div>
 				
 				<!--Facebook-->
 				<label for="timeline_option_providers[facebook]">Facebook</label>
 				<input type="checkbox" name="timeline_option_providers[facebook]" value="1" <?php checked( $timeline_option_providers['facebook'] ) ?> />
 				
 				<!--GitHub-->
-				<label for="timeline_option_providers[github]">GitHub</label>
-				<input type="checkbox" name="timeline_option_providers[github]" value="1" <?php checked( $timeline_option_providers['github'] ) ?> />
-
-				<label for="timeline_option_github[username]">Username</label>
-				<input type="text" name="timeline_option_github[username]" value="<?php echo get_option( 'timeline_option_github' )['username'] ?>" />
-
-				<input type="hidden" name="page" value="timeline_settings" />
-				<p class="submit"><input type="submit" name="submit" id="submit" class="button button-primary" value="Save Changes"></p>
+				<div>
+					<p>
+						<label for="timeline_option_providers[github]">GitHub</label>
+						<input type="checkbox" name="timeline_option_providers[github]" value="1" <?php checked( $timeline_option_providers['github'] ) ?> />
+					</p>
+					<p>
+						<label for="timeline_option_github[username]">Username</label>
+						<input type="text" name="timeline_option_github[username]" value="<?php echo get_option( 'timeline_option_github' )['username'] ?>" />
+					</p>
+				</div>
 			
 				<!--WordPress-->
-				<label for="timeline_option_providers[wordpress]">WordPress</label>
-				<input type="checkbox" name="timeline_option_providers[wordpress]" value="1" <?php checked( $timeline_option_providers['wordpress'] ) ?> />				
+				<div>
+					<p>
+						<label for="timeline_option_providers[wordpress]">WordPress</label>
+						<input type="checkbox" name="timeline_option_providers[wordpress]" value="1" <?php checked( $timeline_option_providers['wordpress'] ) ?> />
+					</p>
+				</div>
+
+				<!--Submit-->
+				<input type="hidden" name="page" value="timeline_settings" />
+				<p class="submit">
+					<input type="submit" name="submit" id="submit" class="button button-primary" value="Save Changes">
+				</p>
 			</form>
 	<?php }
 

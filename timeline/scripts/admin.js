@@ -2,10 +2,11 @@ jQuery(document).ready(function($) {
 
 	$('.hide-button').click(function() {
 
-		var timeline_params = {};
-		timeline_params["id"] = $(this).attr('id').split('-')[1];
+		var timeline_params = {}, 
+			hidden = $(this).data('hidden');
+		timeline_params["id"] = $(this).data('id');
 
-		if ($(this).text() == 'hide') {		
+		if (! hidden) {					
 			
 			var data = {
 				action: 'get_response',
@@ -17,10 +18,11 @@ jQuery(document).ready(function($) {
 				marginLeft: '48px',
 				opacity: 0.5
 			}, '500');
-			$(this).text('unhide');
 		
-		} else {
-
+			$(this).data('hidden', true);
+		
+		} else if (hidden) {
+			
 			var data = {
 				action: 'get_response',
 				timeline_action: 'unhide_post',
@@ -31,13 +33,23 @@ jQuery(document).ready(function($) {
 				marginLeft: '0',
 				opacity: 1
 			}, '500');
+
+			$(this).data('hidden', false);
+		
+		}
+
+		if ($(this).data('hidden')) {
+			$(this).text('unhide');
+		} else {
 			$(this).text('hide');
 		}
-		
+
+
 		$.post('/wp-admin/admin-ajax.php', data, function(response) {
 			var response_obj = $.parseJSON(response);
 			console.log(response_obj);
-		})
+		});
+
 	});
 
 });
