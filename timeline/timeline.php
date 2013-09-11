@@ -31,6 +31,9 @@ class Timeline {
 		'twitter', 'facebook', 'github', 'wordpress'
 		);
 
+	/**
+	 * Create the table that is going to contain all of our timeline posts
+	 */
 	public static function install()
 	{
 		global $wpdb;
@@ -50,6 +53,9 @@ class Timeline {
 		dbDelta( $sql );
 	}
 
+	/**
+	 * Drop the timeline table and clear our timeout transient
+	 */
 	public static function uninstall()
 	{
 		global $wpdb;
@@ -60,6 +66,17 @@ class Timeline {
 			delete_transient( 'timeline_wait' );
 	}
 
+	/**
+	 * Fired on init, if our wait transient has expired, we cycle through all 
+	 * of our active providers and run their sync methods. The WordPress 
+	 * provider is the exception to this, where we don't have a feed / API to 
+	 * check for new data, we just need to register some hooks for when 
+	 * various post operations are triggered.
+	 * 
+	 * Once all of our providers have done thier thing, we reset the wait
+	 * transient to ensure we don't hammer the server every time a page is
+	 * loaded.
+	 */
 	public static function run()
 	{
 		self::$active_providers = get_option( 'timeline_option_providers' );
@@ -84,6 +101,10 @@ class Timeline {
 		set_transient( 'timeline_wait', true, 60*5 );
 	}
 
+	/**
+	 * Hooked into 'wp_ajax_get_response', checks our POST data, validates
+	 * it and runs the appropriate action with the given parameters.
+	 */
 	public static function ajaxResponse()
 	{
 		$timeline_action = isset( $_POST['timeline_action'] ) ? $_POST['timeline_action'] : false;
@@ -131,6 +152,11 @@ class Timeline {
 		die();
 	}
 
+	/**
+	 * Compile all of the ajax errors into one response object so it
+	 * can be iterated over on the client side
+	 * @param  array $errors the errors
+	 */
 	public static function ajaxError( $errors )
 	{
 		$response = array(
@@ -141,6 +167,11 @@ class Timeline {
 		die();
 	}
 
+	/**
+	 * Hide a timeline post
+	 * @param  array $params the parameters for the action
+	 * @return int           the number of rows updated
+	 */
 	public static function ajaxHide( $params )
 	{
 		if ( ! is_array( $params ) || ! array_key_exists( 'id', $params ) )
@@ -149,6 +180,12 @@ class Timeline {
 		return TimelinePost::hide( $params['id'] );
 	}
 
+
+	/**
+	 * Unhide a timeline post
+	 * @param  array $params the parameters for the action
+	 * @return int           the number of rows updated
+	 */
 	public static function ajaxUnhide( $params )
 	{
 		if ( ! is_array( $params ) || ! array_key_exists( 'id', $params ) )
@@ -157,6 +194,9 @@ class Timeline {
 		return TimelinePost::unhide( $params['id'] );
 	}
 
+	/**
+	 * Hooked into admin_menu - add the plugin menu items the the WordPress backend
+	 */
 	public static function addMenus()
 	{
 		$page = add_menu_page(
@@ -183,16 +223,27 @@ class Timeline {
 		add_action( 'admin_print_scripts-' . $settings, array( 'Timeline', 'pageScripts' ) );
 	}
 
+	/**
+	 * Hooked into admin_print_styles - enqueue the timeline admin stylesheet
+	 */
 	public static function pageStyles()
 	{
 		wp_enqueue_style( 'timeline-admin-css', TIMELINE_PLUGIN_URI . "/styles/admin.css" );
 	}
 
+	/**
+	 * Hooked into admin_print_scripts - enqueue the timeline admin javascript
+	 */
 	public static function pageScripts()
 	{
 		wp_enqueue_script( 'timeline-admin-scripts', TIMELINE_PLUGIN_URI . "/scripts/admin.js", array( 'jquery' ), '0.1' );
 	}
 
+	/**
+	 * Loop through the timeline submitted timeline settings and save them to
+	 * the database.
+	 * @param  array $data the submission data
+	 */
 	public static function saveSettings( $data )
 	{
 		$providers = array();
@@ -208,6 +259,12 @@ class Timeline {
 		self::saveProviderSwitches( $providers );
 	}
 
+	/**
+	 * Check if a checkbox's value has been submitted, if not, disable it's
+	 * option in the database
+	 * @param  [type] $value [description]
+	 * @return [type]        [description]
+	 */
 	public static function saveProviderSwitches( $value )
 	{
 		if ( ! is_array( $value ) )
@@ -215,55 +272,25 @@ class Timeline {
 
 		$cleaned = array();
 
-		foreach ( self::$available_providers as $provider ) {
-			if ( array_key_exists( $provider, $value ) ) {
-				$cleaned[ $provider ] = 1;
-			} else {
-				$cleaned[ $provider ] = 0;
-			}
-		}
+		foreach ( self::$available_providers as $provider )
+			$cleaned[ $provider ] = array_key_exists( $provider, $value ) ? 1 : 0;
 
 		update_option( 'timeline_option_providers', $cleaned );
 	}
 
+	/**
+	 * Get the page content for the timeline from the main admin page template
+	 */
 	public static function pageContent()
 	{ 
 		$posts = TimelinePost::all();
-		?>
+		require_once( 'templates/admin_timeline.php' );
+	}
 
-		<div class="wrap" id="container">
-			<h2>Timeline</h2>
-
-			<ol id="timeline">
-
-			<?php
-			if ( $posts ) {
-				$i = 0;
-				foreach ( $posts as $post ) { 
-					?>
-						<li class="timeline-item <?php echo strtolower( $post->service ); echo $post->hidden ? ' hidden' : ''; echo $i == 0 ? ' latest' : ''; ?>">
-							<div class="left-margin">
-								<img src="<?php echo TIMELINE_PLUGIN_URI ?>/images/<?php echo strtolower( $post->service ) ?>-32.png" alt="<?php echo $post->service ?> logo" />
-							</div>
-							<div class="right-margin">
-								<p class="content"><?php echo $post->content ?></p>
-								<p class="byline"><span id="datetime"><?php echo date( 'd/m/y H:i:s', $post->time ) ?></span> via <a href="#" class="vialink"><?php echo $post->service ?></a>
-								<?php if ( strtolower( $post->service ) != 'wordpress' ) : ?>
-									<a data-id="<?php echo $post->id ?>" data-hidden="<?php echo $post->hidden ? 'true' : 'false' ?>" class="hide-button"><?php echo $post->hidden ? 'unhide' : 'hide' ?></a>
-								<?php endif; ?>
-								</p>
-							</div>
-						</li>
-				<?php 
-					$i++;
-				}
-			} ?>
-
-			</ol>
-		</div>
-
-	<?php }
-
+	/**
+	 * Check for any post data before getting the page content from the settings
+	 * page template file.
+	 */
 	public static function settingsPageContent()
 	{ 
 		if ( isset( $_POST['page'] ) && $_POST['page'] == 'timeline_settings' )
@@ -273,71 +300,8 @@ class Timeline {
 			delete_transient( 'timeline_wait' );
 
 		$timeline_option_providers = self::$active_providers;
-		?>
-		<div class="wrap" id="container">
-			<h2>Timeline Settings</h2>
-
-			<form action="" method="post">
-				<!--Twitter-->
-				<div>
-					<p>
-						<label for="timeline_option_providers[twitter]">Twitter</label>
-						<input type="checkbox" name="timeline_option_providers[twitter]" value="1" <?php checked( $timeline_option_providers['twitter'] ) ?> />
-					</p>
-					
-					<p>
-						<label for="timeline_option_twitter[username]">Username</label>
-						<input type="text" name="timeline_option_twitter[username]" value="<?php echo get_option( 'timeline_option_twitter' )['username'] ?>" />
-					</p>
-					<p>
-						<label for="timeline_option_twitter[consumer_key]">Consumer Key</label>
-						<input type="text" name="timeline_option_twitter[consumer_key]" value="<?php echo get_option( 'timeline_option_twitter' )['consumer_key'] ?>" />
-					</p>
-					<p>
-						<label for="timeline_option_twitter[consumer_secret]">Consumer Secret</label>
-						<input type="text" name="timeline_option_twitter[consumer_secret]" value="<?php echo get_option( 'timeline_option_twitter' )['consumer_secret'] ?>" />
-					</p>
-					<p>
-						<label for="timeline_option_twitter[access_token]">Access Token</label>
-						<input type="text" name="timeline_option_twitter[access_token]" value="<?php echo get_option( 'timeline_option_twitter' )['access_token'] ?>" />
-					</p>
-					<p>
-						<label for="timeline_option_twitter[access_token_secret]">Access Token Secret</label>
-						<input type="text" name="timeline_option_twitter[access_token_secret]" value="<?php echo get_option( 'timeline_option_twitter' )['access_token_secret'] ?>" />
-					</p>
-				</div>
-				
-				<!--Facebook-->
-				<label for="timeline_option_providers[facebook]">Facebook</label>
-				<input type="checkbox" name="timeline_option_providers[facebook]" value="1" <?php checked( $timeline_option_providers['facebook'] ) ?> />
-				
-				<!--GitHub-->
-				<div>
-					<p>
-						<label for="timeline_option_providers[github]">GitHub</label>
-						<input type="checkbox" name="timeline_option_providers[github]" value="1" <?php checked( $timeline_option_providers['github'] ) ?> />
-					</p>
-					<p>
-						<label for="timeline_option_github[username]">Username</label>
-						<input type="text" name="timeline_option_github[username]" value="<?php echo get_option( 'timeline_option_github' )['username'] ?>" />
-					</p>
-				</div>
-			
-				<!--WordPress-->
-				<div>
-					<p>
-						<label for="timeline_option_providers[wordpress]">WordPress</label>
-						<input type="checkbox" name="timeline_option_providers[wordpress]" value="1" <?php checked( $timeline_option_providers['wordpress'] ) ?> />
-					</p>
-				</div>
-
-				<!--Submit-->
-				<input type="hidden" name="page" value="timeline_settings" />
-				<p class="submit">
-					<input type="submit" name="submit" id="submit" class="button button-primary" value="Save Changes">
-				</p>
-			</form>
-	<?php }
+		require_once( 'templates/admin_settings.php' );
+		}
 
 }
 
