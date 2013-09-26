@@ -86,7 +86,7 @@ class Timeline {
 	 * check for new data, we just need to register some hooks for when 
 	 * various post operations are triggered.
 	 * 
-	 * Once all of our providers have done thier thing, we reset the wait
+	 * Once all of our providers have done their thing, we reset the wait
 	 * transient to ensure we don't hammer the server every time a page is
 	 * loaded.
 	 */
