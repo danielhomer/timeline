@@ -70,10 +70,10 @@ class Timeline {
 	{
 		global $wpdb;
 		$posts_table = $wpdb->prefix . 'timeline';
-		$wpdb->query( $wpdb->prepare( "DROP TABLE IF EXISTS $posts_table" ) );
+		$wpdb->query( "DROP TABLE IF EXISTS $posts_table" );
 
 		$error_table = $wpdb->prefix . 'timeline_errors';
-		$wpdb->query( $wpdb->prepare( "DROP TABLE IF EXISTS $error_table" ) );
+		$wpdb->query( "DROP TABLE IF EXISTS $error_table" );
 
 		if ( get_transient( 'timeline_wait' ) )
 			delete_transient( 'timeline_wait' );
