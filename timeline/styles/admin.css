@@ -130,3 +130,112 @@ html {
 	width: 75%;
 }
 }
+
+/* Admin */
+
+#container .service-box {
+	clear: both;
+}
+
+#container .service-box h3 {
+	width: auto;
+	color: #fff;
+	font-weight: normal;
+	padding: 10px;
+	margin: 0;
+}
+
+#container .service-box h3::selection {
+	background: transparent;
+}
+
+#container .service-box h3 span {
+	display: none;
+	font-size: 0.8em;
+	float: right;
+}
+
+#container .service-box p label {
+	display: inline-block;
+	width: 150px !important;
+}
+
+#container .service-box p .input-large {
+	width: 365px;
+}
+
+#container .service-box h3:hover span {
+	display: inline;
+}
+
+#container .service-box ul {
+	padding: 0 10px;
+}
+
+#twitter-options h3 {
+	background-color: #00ACED;
+}
+
+#facebook-options h3 {
+	background-color: #3B5998;	
+}
+
+#wordpress-options h3 {
+	background-color: #21759B;	
+}
+
+#github-options h3 {
+	background-color: #4183C4;	
+}
+
+#timeline-errors h3, #timeline-settings h3 {
+	background-color: #9E9E9E;
+}
+
+#timeline-errors ul li {
+	font-family: "Consolas", Monaco, monospace;
+}
+
+#timeline-errors ul {
+	height: 150px;
+	width: 94%;
+	overflow: scroll;
+	overflow-x: hidden;
+}
+
+#container .service-box .toggle-header:hover, #container .service-box h3 span:hover {
+	cursor: pointer;
+}
+
+#container .service-box {
+	border: 1px solid #efefef;
+	margin-top: 10px;
+}
+
+#container .service-box p {
+	padding: 10px;
+}
+
+#container .service-box.disabled h3 {
+	background-color: #ccc !important;
+}
+
+#container .service-box.disabled p, #container .service-box.disabled ul {
+	display: none;
+}
+
+#container .service-box.half-width {
+	width: 49%;
+	min-height: 210px;
+	margin-bottom: 10px;
+}
+
+#container .service-box.half-width.left {
+	float: left;
+	clear: left;
+}
+
+#container .service-box.half-width.right {
+	float: right;
+	clear: right;
+}

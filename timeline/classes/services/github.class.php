@@ -15,8 +15,17 @@ class GitHub extends TimelineService {
 	{
 		$events = $this->get( $this->url, $this->username );
 
-		if ( ! $events || empty( $events ) )
-			return;
+		if ( ! $events || empty( $events ) ) {
+			$error = new TimelineError( 'github', 'error', "Couldn't fetch data the GitHub API, check https://status.github.com/" );
+			$error->log();
+			return false;
+		}
+
+		if ( $events->message == 'Not Found' ) {
+			$error = new TimelineError( 'github', 'error', "Invalid username" );
+			$error->log();
+			return false;
+		}
 
 		$i = 0;
 		foreach ( $events as $event ) {
@@ -118,6 +127,8 @@ class GitHub extends TimelineService {
 				break;
 
 			default:
+				$error = new TimelineError( 'github', 'error', 'Unknown event type "'. $event->type .'" [' . $event->id . ']' );
+				$error->log();
 				return false;
 				break;
 		}

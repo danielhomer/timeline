@@ -1,13 +1,28 @@
 <div class="wrap" id="container">
 	<h2>Timeline Settings</h2>
 
-	<form action="" method="post">
+	<div class="service-box half-width left" id="timeline-settings">
+		<h3>General Settings</h3>
+	</div>
+
+	<div class="service-box half-width right" id="timeline-errors">
+		<h3>Error Log <span id="clear-log">clear log</span></h3>
+		<ul id="log">
+			<?php if ( $errors ) { 
+				foreach ( $errors as $error ) { ?>
+					<li><?php echo '[' . $error->time . '] [' . $error->provider . '] [' . $error->severity . '] ' . $error->message ?></li>
+				<?php }
+				} else { ?>
+					<li>No errors :)</li>
+			<?php } ?>
+		</ul>
+	</div>
+
+	<form action="<?php echo admin_url( 'admin.php?page=timeline-settings&updated=true' ) ?>" method="post">
 		<!--Twitter-->
-		<div>
-			<p>
-				<label for="timeline_option_providers[twitter]">Twitter</label>
-				<input type="checkbox" name="timeline_option_providers[twitter]" value="1" <?php checked( $timeline_option_providers['twitter'] ) ?> />
-			</p>
+		<div class="service-box <?php echo $timeline_option_providers['twitter'] ? '' : 'disabled' ?>" id="twitter-options">
+			<h3 class="toggle-header">Twitter <span>click to toggle</span></h3>
+			<input class="hidden" type="checkbox" name="timeline_option_providers[twitter]" value="1" <?php checked( $timeline_option_providers['twitter'] ) ?> />
 			
 			<p>
 				<label for="timeline_option_twitter[username]">Username</label>
@@ -15,32 +30,25 @@
 			</p>
 			<p>
 				<label for="timeline_option_twitter[consumer_key]">Consumer Key</label>
-				<input type="text" name="timeline_option_twitter[consumer_key]" value="<?php echo get_option( 'timeline_option_twitter' )['consumer_key'] ?>" />
+				<input class="input-large" type="text" name="timeline_option_twitter[consumer_key]" value="<?php echo get_option( 'timeline_option_twitter' )['consumer_key'] ?>" />
 			</p>
 			<p>
 				<label for="timeline_option_twitter[consumer_secret]">Consumer Secret</label>
-				<input type="text" name="timeline_option_twitter[consumer_secret]" value="<?php echo get_option( 'timeline_option_twitter' )['consumer_secret'] ?>" />
+				<input class="input-large" type="text" name="timeline_option_twitter[consumer_secret]" value="<?php echo get_option( 'timeline_option_twitter' )['consumer_secret'] ?>" />
 			</p>
 			<p>
 				<label for="timeline_option_twitter[access_token]">Access Token</label>
-				<input type="text" name="timeline_option_twitter[access_token]" value="<?php echo get_option( 'timeline_option_twitter' )['access_token'] ?>" />
+				<input class="input-large" type="text" name="timeline_option_twitter[access_token]" value="<?php echo get_option( 'timeline_option_twitter' )['access_token'] ?>" />
 			</p>
 			<p>
 				<label for="timeline_option_twitter[access_token_secret]">Access Token Secret</label>
-				<input type="text" name="timeline_option_twitter[access_token_secret]" value="<?php echo get_option( 'timeline_option_twitter' )['access_token_secret'] ?>" />
+				<input class="input-large" type="text" name="timeline_option_twitter[access_token_secret]" value="<?php echo get_option( 'timeline_option_twitter' )['access_token_secret'] ?>" />
 			</p>
 		</div>
 		
-		<!--Facebook-->
-		<label for="timeline_option_providers[facebook]">Facebook</label>
-		<input type="checkbox" name="timeline_option_providers[facebook]" value="1" <?php checked( $timeline_option_providers['facebook'] ) ?> />
-		
-		<!--GitHub-->
-		<div>
-			<p>
-				<label for="timeline_option_providers[github]">GitHub</label>
-				<input type="checkbox" name="timeline_option_providers[github]" value="1" <?php checked( $timeline_option_providers['github'] ) ?> />
-			</p>
+		<div class="service-box <?php echo $timeline_option_providers['github'] ? '' : 'disabled' ?>" id="github-options">
+			<h3 class="toggle-header">GitHub <span>click to toggle</span></h3>
+			<input class="hidden" type="checkbox" name="timeline_option_providers[github]" value="1" <?php checked( $timeline_option_providers['github'] ) ?> />
 			<p>
 				<label for="timeline_option_github[username]">Username</label>
 				<input type="text" name="timeline_option_github[username]" value="<?php echo get_option( 'timeline_option_github' )['username'] ?>" />
@@ -48,11 +56,10 @@
 		</div>
 	
 		<!--WordPress-->
-		<div>
-			<p>
-				<label for="timeline_option_providers[wordpress]">WordPress</label>
-				<input type="checkbox" name="timeline_option_providers[wordpress]" value="1" <?php checked( $timeline_option_providers['wordpress'] ) ?> />
-			</p>
+		<div class="service-box <?php echo $timeline_option_providers['wordpress'] ? '' : 'disabled' ?>" id="wordpress-options">
+			<h3 class="toggle-header">WordPress <span>click to toggle</span></h3>
+			<input class="hidden" type="checkbox" name="timeline_option_providers[wordpress]" value="1" <?php checked( $timeline_option_providers['wordpress'] ) ?> />
+			<p>The Timeline is now monitoring posts on this blog. Whenever a new post is published, it'll be added to the timeline.</p>
 		</div>
 
 		<!--Submit-->

@@ -38,6 +38,8 @@ class Timeline {
 	{
 		global $wpdb;
 		$posts_table = $wpdb->prefix . 'timeline';
+		$error_table = $wpdb->prefix . 'timeline_errors';
+
 		$sql = "CREATE TABLE $posts_table (
 			id int(9) NOT NULL AUTO_INCREMENT,
 			service varchar(45) NOT NULL,
@@ -46,6 +48,14 @@ class Timeline {
 			attributes varchar(2048) NOT NULL,
 			time int(10) NOT NULL,
 			hidden int(1),
+			UNIQUE KEY id (id)
+			);
+			CREATE TABLE $error_table (
+			id int(9) NOT NULL AUTO_INCREMENT,
+			provider varchar(45) NOT NULL,
+			severity varchar(45) NOT NULL,
+			message varchar(2048) NOT NULL,
+			time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			UNIQUE KEY id (id)
 			);";
 
@@ -60,7 +70,10 @@ class Timeline {
 	{
 		global $wpdb;
 		$posts_table = $wpdb->prefix . 'timeline';
-		$wpdb->query( $wpdb->prepare( "DROP TABLE IF EXISTS %s", $posts_table ) );
+		$wpdb->query( $wpdb->prepare( "DROP TABLE IF EXISTS $posts_table" ) );
+
+		$error_table = $wpdb->prefix . 'timeline_errors';
+		$wpdb->query( $wpdb->prepare( "DROP TABLE IF EXISTS $error_table" ) );
 
 		if ( get_transient( 'timeline_wait' ) )
 			delete_transient( 'timeline_wait' );
@@ -133,6 +146,11 @@ class Timeline {
 			case 'unhide_post':
 				$status = "OK";
 				$results['rows_updated'] = self::ajaxUnhide( $timeline_params );
+				break;
+
+			case 'clear_error_log':
+				$status = "OK";
+				$results['message'] = TimelineError::clear();
 				break;
 
 			default:
@@ -257,6 +275,7 @@ class Timeline {
 		}
 
 		self::saveProviderSwitches( $providers );
+		self::$active_providers = get_option( 'timeline_option_providers' );
 	}
 
 	/**
@@ -267,16 +286,13 @@ class Timeline {
 	 */
 	public static function saveProviderSwitches( $value )
 	{
-		if ( ! is_array( $value ) )
-			return false;
-
 		$cleaned = array();
 
 		foreach ( self::$available_providers as $provider )
 			$cleaned[ $provider ] = array_key_exists( $provider, $value ) ? 1 : 0;
 
 		update_option( 'timeline_option_providers', $cleaned );
-	}
+	}	
 
 	/**
 	 * Get the page content for the timeline from the main admin page template
@@ -292,16 +308,15 @@ class Timeline {
 	 * page template file.
 	 */
 	public static function settingsPageContent()
-	{ 
+	{
 		if ( isset( $_POST['page'] ) && $_POST['page'] == 'timeline_settings' )
 			self::saveSettings( $_POST );
 
-		if ( get_transient( 'timeline_wait' ) )
-			delete_transient( 'timeline_wait' );
-
 		$timeline_option_providers = self::$active_providers;
-		require_once( 'templates/admin_settings.php' );
-		}
+		$errors = TimelineError::get();
+
+		require_once( 'templates/admin_settings.php' );	
+	}
 
 }
 
