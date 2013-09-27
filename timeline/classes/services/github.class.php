@@ -25,8 +25,10 @@ class GitHub extends TimelineService {
 		if ( is_object( $events ) ) {
 			if ( $events->message == 'Not Found') {
 				$error = new TimelineError( 'github', 'error', 'Username not found' );
-				$error->log();
+			} else {
+				$error = new TimelineError( 'github', 'error', $events->message );
 			}
+			$error->log();
 			return false;
 		}
 
