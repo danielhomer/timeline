@@ -149,10 +149,22 @@ html {
 	background: transparent;
 }
 
-#container .service-box h3 span {
+#container .service-box h3 .toggle, #container .service-box h3 #clear-log {
 	display: none;
 	font-size: 0.8em;
 	float: right;
+}
+
+#container .service-box h3 .tick, #container .service-box h3 .cross {
+	margin-right: 10px;
+}
+
+#container .service-box.disabled .tick, #container .service-box .cross {
+	display: none;
+}
+
+#container .service-box.disabled .cross {
+	display: inline-block;
 }
 
 #container .service-box p label {
@@ -164,7 +176,7 @@ html {
 	width: 365px;
 }
 
-#container .service-box h3:hover span {
+#container .service-box h3:hover .toggle, #container .service-box:hover #clear-log {
 	display: inline;
 }
 
@@ -196,6 +208,10 @@ html {
 	font-family: "Consolas", Monaco, monospace;
 }
 
+#timeline-errors ul li:hover {
+	background-color: #F8F8F8;
+}
+
 #timeline-errors ul {
 	height: 150px;
 	width: 94%;
@@ -203,8 +219,12 @@ html {
 	overflow-x: hidden;
 }
 
-#container .service-box .toggle-header:hover, #container .service-box h3 span:hover {
+#container .service-box .toggle-header:hover, #container .service-box h3 #clear-log:hover {
 	cursor: pointer;
+}
+
+#container .service-box h3 #clear-log:hover {
+	text-decoration: underline;
 }
 
 #container .service-box {

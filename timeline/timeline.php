@@ -61,6 +61,20 @@ class Timeline {
 
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		dbDelta( $sql );
+
+		$default_options = array(
+			'timeline_option_general' => array(
+				'update_interval' => 10
+				),
+			);
+
+		foreach ( $default_options as $option => $value ) {
+			if ( ! get_option( $option ) ) {
+				add_option( $option, $value );
+			} else {
+				update_option( $option, $value );
+			}
+		}
 	}
 
 	/**
@@ -92,6 +106,7 @@ class Timeline {
 	 */
 	public static function run()
 	{
+		$options = get_option( 'timeline_option_general' );
 		self::$active_providers = get_option( 'timeline_option_providers' );
 
 		if ( self::$active_providers['wordpress'] ) {
@@ -111,7 +126,17 @@ class Timeline {
 			}
 		}
 
-		set_transient( 'timeline_wait', true, 60*5 );
+		$interval_option = round( $options['update_interval'], 2);
+
+		if ( is_numeric( $interval_option ) && $interval_option >= 1 && $interval_option <= 300 ) {
+			$wait = 60 * $interval_option;
+		} else {
+			$wait = 60 * 10;
+			$options[ 'update_interval' ] = $wait;
+			update_option( 'timeline_option_general', $options );
+		}
+		
+		set_transient( 'timeline_wait', true, $wait );
 	}
 
 	/**
@@ -276,6 +301,8 @@ class Timeline {
 
 		self::saveProviderSwitches( $providers );
 		self::$active_providers = get_option( 'timeline_option_providers' );
+
+		if ( get_transient( 'timeline_wait' ) ) delete_transient( 'timeline_wait' );
 	}
 
 	/**
@@ -287,12 +314,19 @@ class Timeline {
 	public static function saveProviderSwitches( $value )
 	{
 		$cleaned = array();
+		$current_settings = get_option( 'timeline_option_providers' );
 
-		foreach ( self::$available_providers as $provider )
+		foreach ( self::$available_providers as $provider ) {
 			$cleaned[ $provider ] = array_key_exists( $provider, $value ) ? 1 : 0;
+		}
+
+		foreach ( $cleaned as $provider => $new ) {
+			if ( $current_settings[ $provider ] === 1 && $new === 0 )
+				TimelinePost::delete( $provider, 'service' );
+		}
 
 		update_option( 'timeline_option_providers', $cleaned );
-	}	
+	}
 
 	/**
 	 * Get the page content for the timeline from the main admin page template

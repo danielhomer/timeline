@@ -8,7 +8,8 @@ class GitHub extends TimelineService {
 
 	public function __construct()
 	{
-		$this->username = get_option( 'timeline_option_github' )['username'];
+		$options = get_option( 'timeline_option_github' );
+		$this->username = $options['username'];
 	}
 
 	public function sync()
@@ -16,14 +17,16 @@ class GitHub extends TimelineService {
 		$events = $this->get( $this->url, $this->username );
 
 		if ( ! $events || empty( $events ) ) {
-			$error = new TimelineError( 'github', 'error', "Couldn't fetch data the GitHub API, check https://status.github.com/" );
+			$error = new TimelineError( 'github', 'error', "Couldn't fetch data from GitHub, check https://status.github.com/ or increase the update interval." );
 			$error->log();
 			return false;
 		}
 
-		if ( $events->message == 'Not Found' ) {
-			$error = new TimelineError( 'github', 'error', "Invalid username" );
-			$error->log();
+		if ( is_object( $events ) ) {
+			if ( $events->message == 'Not Found') {
+				$error = new TimelineError( 'github', 'error', 'Username not found' );
+				$error->log();
+			}
 			return false;
 		}
 

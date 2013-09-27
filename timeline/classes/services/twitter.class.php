@@ -11,11 +11,12 @@ class Twitter extends TimelineService {
 
 	public function __construct()
 	{
-		$this->username = get_option( 'timeline_option_twitter' )['username'];
-		$this->consumer_key = get_option( 'timeline_option_twitter' )['consumer_key'];
-		$this->consumer_secret = get_option( 'timeline_option_twitter' )['consumer_secret'];
-		$this->access_token = get_option( 'timeline_option_twitter' )['access_token'];
-		$this->access_token_secret = get_option( 'timeline_option_twitter' )['access_token_secret'];
+		$options = get_option( 'timeline_option_twitter' );
+		$this->username = $options['username'];
+		$this->consumer_key = $options['consumer_key'];
+		$this->consumer_secret = $options['consumer_secret'];
+		$this->access_token = $options['access_token'];
+		$this->access_token_secret = $options['access_token_secret'];
 		$this->sha1_method = new OAuthSignatureMethod_HMAC_SHA1();
 	    $this->consumer = new OAuthConsumer( $this->consumer_key, $this->consumer_secret );
 	    
@@ -29,9 +30,22 @@ class Twitter extends TimelineService {
 	public function sync()
 	{
 		$tweets = $this->get('statuses/user_timeline', array( 'screen_name' => $this->username ) );
-		
-		if ( ! $tweets || empty( $tweets ) )
-			return;
+
+		if ( ! $tweets || empty( $tweets ) ) {
+			$error = new TimelineError( 'twitter', 'error', "Couldn't fetch data from Twitter, check https://dev.twitter.com/status or increase the update interval." );
+			$error->log();
+			return false;
+		}
+
+		if ( is_object( $tweets ) ) {
+			if ( $tweets->errors ) {
+				foreach( $tweets->errors as $api_error ) {
+					$error = new TimelineError( 'twitter', 'error', $api_error->message . ' [code: ' . $api_error->code . ']' ); 
+					$error->log();
+				}
+				return false;
+			}
+		}
 
 		$i = 0;
 		foreach ( $tweets as $tweet ) {

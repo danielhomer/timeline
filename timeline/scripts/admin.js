@@ -3,6 +3,8 @@ jQuery(document).ready(function($) {
 	$('#log').scrollTop($('#log').prop('scrollHeight'));
 
 	$('#clear-log').click(function() {
+		$('#log').html('<li>Clearing...</li>');
+
 		var data = {
 			action: 'get_response',
 			timeline_action: 'clear_error_log'
