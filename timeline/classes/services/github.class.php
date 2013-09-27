@@ -8,6 +8,8 @@ class GitHub extends TimelineService {
 
 	public function __construct()
 	{
+		parent::__construct();
+
 		$options = get_option( 'timeline_option_github' );
 		$this->username = $options['username'];
 	}
@@ -34,15 +36,14 @@ class GitHub extends TimelineService {
 
 		$i = 0;
 		foreach ( $events as $event ) {
-			if ( $i === 0 && TimelinePost::get( $event->id ) )
-				return false;
-
-			$timelinePost = new TimelinePost();
-			$timelinePost->service = "GitHub";
-			$timelinePost->serviceID = $event->id;
-			$timelinePost->content = $this->getContent( $event );
-			$timelinePost->time = strtotime( $event->created_at );
-			$timelinePost->save();
+			if ( ! in_array( $event->id, $this->service_ids ) ) {
+				$timelinePost = new TimelinePost();
+				$timelinePost->service = "GitHub";
+				$timelinePost->serviceID = $event->id;
+				$timelinePost->content = $this->getContent( $event );
+				$timelinePost->time = strtotime( $event->created_at );
+				$timelinePost->save();
+			}
 		}
 	}
 

@@ -11,6 +11,8 @@ class Twitter extends TimelineService {
 
 	public function __construct()
 	{
+		parent::__construct();
+
 		$options = get_option( 'timeline_option_twitter' );
 		$this->username = $options['username'];
 		$this->consumer_key = $options['consumer_key'];
@@ -49,15 +51,14 @@ class Twitter extends TimelineService {
 
 		$i = 0;
 		foreach ( $tweets as $tweet ) {
-			if ( $i === 0 && TimelinePost::get( $tweet->id_str ) )
-				return false;
-
-			$timelinePost = new TimelinePost();
-			$timelinePost->service = "Twitter";
-			$timelinePost->serviceID = $tweet->id_str;
-			$timelinePost->content = $tweet->text;
-			$timelinePost->time = strtotime( $tweet->created_at );
-			$timelinePost->save();
+			if ( ! in_array( $tweet->id_str, $this->service_ids ) ) {
+				$timelinePost = new TimelinePost();
+				$timelinePost->service = "Twitter";
+				$timelinePost->serviceID = $tweet->id_str;
+				$timelinePost->content = $tweet->text;
+				$timelinePost->time = strtotime( $tweet->created_at );
+				$timelinePost->save();
+			}
 		}
 	}
 

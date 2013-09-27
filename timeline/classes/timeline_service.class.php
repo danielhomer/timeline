@@ -11,6 +11,14 @@ class TimelineService {
 	protected $ssl_verifypeer = FALSE;
 	protected $format = 'json';
 	protected $decode_json = TRUE;
+	protected $service_ids = array();
+
+	public function __construct()
+	{
+		global $wpdb;
+		$posts_table = $wpdb->prefix . 'timeline';
+		$this->service_ids = $wpdb->get_col( "SELECT service_id FROM $posts_table" );
+	}
 
 	protected function http( $url, $method, $postfields = NULL )
 	{
