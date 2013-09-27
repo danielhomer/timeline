@@ -18,7 +18,7 @@ class Twitter extends TimelineService {
 		$this->access_token = $options['access_token'];
 		$this->access_token_secret = $options['access_token_secret'];
 		$this->sha1_method = new OAuthSignatureMethod_HMAC_SHA1();
-	    $this->consumer = new OAuthConsumer( $this->consumer_key, $this->consumer_secret );
+		$this->consumer = new OAuthConsumer( $this->consumer_key, $this->consumer_secret );
 	    
 	    if ( ! empty( $this->access_token ) && ! empty( $this->access_token_secret ) ) {
 			$this->token = new OAuthConsumer( $this->access_token, $this->access_token_secret );

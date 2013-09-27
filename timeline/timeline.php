@@ -28,7 +28,7 @@ class Timeline {
 
 	public static $active_providers;
 	public static $available_providers = array(
-		'twitter', 'facebook', 'github', 'wordpress'
+		'twitter', 'github', 'wordpress'
 		);
 
 	/**
