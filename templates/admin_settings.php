@@ -9,7 +9,13 @@
 			<?php endif; ?>
 				<p>
 					<label for="timeline_option_general[update_interval]">Update interval</label>
-					<input class="small-text" type="text" name="timeline_option_general[update_interval]" value="<?php echo get_option( 'timeline_option_general' )['update_interval'] ?>" /> minutes
+					<input class="small-text" type="text" name="timeline_option_general[update_interval]" value="<?php echo get_option( 'timeline_option_general' )['update_interval'] ?>" /> minutes<br>
+					<span class="description">The amount of time to wait before checking the provider servers for new data. Raise this number if you're getting experiencing slow-downs or errors.</span>
+				</p>
+				<p>
+					<label for="timeline_option_general[max_posts]">Maximum posts</label>
+					<input class="small-text" type="text" name="timeline_option_general[max_posts]" value="<?php echo get_option( 'timeline_option_general' )['max_posts'] ?>" /><br>
+					<span class="description">The maximum number of timeline posts to display before the 'More' link</span>
 				</p>
 		</div>
 

@@ -16,11 +16,17 @@ class TimelinePost {
 		$this->posts_table = $wpdb->prefix . 'timeline';
 	}
 
-	public static function all()
+	public static function all( $start = 0, $max = false )
 	{
+		if ( ! $max ) {
+			$limit = '';
+		} else {
+			$limit = "LIMIT $start, $max";
+		}
+
 		global $wpdb;
 		$posts_table = $wpdb->prefix . 'timeline';
-		return $wpdb->get_results( "SELECT * FROM $posts_table ORDER BY time DESC" );
+		return $wpdb->get_results( "SELECT * FROM $posts_table ORDER BY time DESC $limit" );
 	}
 
 	public static function get( $id, $column = "service_id" )

@@ -66,7 +66,8 @@ class Timeline {
 
 		$default_options = array(
 			'timeline_option_general' => array(
-				'update_interval' => 10
+				'update_interval' => 10,
+				'max_posts' => 10
 				),
 			);
 
@@ -133,9 +134,10 @@ class Timeline {
 		if ( is_numeric( $interval_option ) && $interval_option >= 1 && $interval_option <= 300 ) {
 			$wait = 60 * $interval_option;
 		} else {
-			$wait = 60 * 10;
-			$options[ 'update_interval' ] = $wait;
+			$interval_option = 10;
+			$options[ 'update_interval' ] = $interval_option;
 			update_option( 'timeline_option_general', $options );
+			$wait = 60 * $interval_option;
 		}
 		
 		set_transient( 'timeline_wait', true, $wait );
@@ -332,7 +334,8 @@ class Timeline {
 
 	public static function doShortcode()
 	{
-		$posts = TimelinePost::all();
+		$options = get_option( 'timeline_option_general' );
+		$posts = TimelinePost::all( 0, $options['max_posts'] );
 		require_once( 'templates/timeline.php' );
 	}
 
