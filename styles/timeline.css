@@ -106,6 +106,25 @@
 	background: #eaeaea;
 }
 
+.timeline-item.end {
+	margin: -5px 0;
+}
+
+.timeline-item.end .left-margin {
+	background-color: #ccc;
+	width: 30px;
+	min-width: 30px;
+	height: 4px;
+}
+
+.timeline-item.more {
+	margin: 10px 0 -5px;
+}
+
+.timeline-item.more p {
+	margin: 5px 0 !important;
+}
+
 .timeline-item.github:hover img {
 	background-color: #4183C4;
 }

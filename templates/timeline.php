@@ -4,6 +4,18 @@
 if ( $posts ) {
 	$i = 0;
 	foreach ( $posts as $post ) { if ( ! $post->hidden ) {
+		if ( $post->service == 'end' ) { ?>
+			<li class="timeline-item <?php echo strtolower( $post->service ); echo $i == 0 ? ' latest' : ''; ?>">
+				<div class="left-margin"></div>
+			</li>
+		<?php } else if ( $post->service == 'more' ) { ?>
+			<li class="timeline-item <?php echo strtolower( $post->service ); echo $i == 0 ? ' latest' : ''; ?>">
+				<div class="left-margin"><img src="<?php echo TIMELINE_PLUGIN_URI ?>/images/<?php echo strtolower( $post->service ) ?>-32.png" alt="<?php echo $post->service ?> logo" /></div>
+				<div class="right-margin">
+					<p class="content"><a href="">Load more posts</a></p>
+				</div>
+			</li>
+		<?php } else {
 		?>
 			<li class="timeline-item <?php echo strtolower( $post->service ); echo $i == 0 ? ' latest' : ''; ?>">
 				<div class="left-margin">
@@ -16,7 +28,7 @@ if ( $posts ) {
 				</div>
 			</li>
 	<?php 
-	}
+	} }
 		$i++;
 	}
 } ?>

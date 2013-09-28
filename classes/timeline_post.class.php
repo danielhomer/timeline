@@ -18,15 +18,22 @@ class TimelinePost {
 
 	public static function all( $start = 0, $max = false )
 	{
-		if ( ! $max ) {
-			$limit = '';
-		} else {
-			$limit = "LIMIT $start, $max";
-		}
-
 		global $wpdb;
 		$posts_table = $wpdb->prefix . 'timeline';
-		return $wpdb->get_results( "SELECT * FROM $posts_table ORDER BY time DESC $limit" );
+		return $wpdb->get_results( "SELECT * FROM $posts_table ORDER BY time DESC" );
+	}
+
+	public static function inBounds( $start = 0, $stop = 10 )
+	{
+		global $wpdb;
+		$posts_table = $wpdb->prefix . 'timeline';
+		$results = $wpdb->get_results( "SELECT * FROM $posts_table ORDER BY time DESC LIMIT $start, $stop" );
+
+		$trailer = new stdClass();
+		$trailer->service = $wpdb->num_rows < $stop ? 'end' : 'more';
+		$results[] = $trailer;
+
+		return $results;
 	}
 
 	public static function get( $id, $column = "service_id" )

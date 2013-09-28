@@ -335,7 +335,7 @@ class Timeline {
 	public static function doShortcode()
 	{
 		$options = get_option( 'timeline_option_general' );
-		$posts = TimelinePost::all( 0, $options['max_posts'] );
+		$posts = TimelinePost::inBounds( 0, $options['max_posts'] );
 		require_once( 'templates/timeline.php' );
 	}
 
