@@ -129,7 +129,7 @@ class Timeline {
 			}
 		}
 
-		$interval_option = round( $options['update_interval'], 2);
+		$interval_option = round( $options['update_interval'], 2 );
 
 		if ( is_numeric( $interval_option ) && $interval_option >= 1 && $interval_option <= 300 ) {
 			$wait = 60 * $interval_option;
@@ -333,7 +333,7 @@ class Timeline {
 
 	/**
 	* Generate the timeline for the front end using the maximum post count set on
-	* the setting page.
+	* the settings page.
 	*/
 	public static function doShortcode()
 	{
