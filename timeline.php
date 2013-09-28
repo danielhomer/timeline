@@ -23,6 +23,8 @@ register_deactivation_hook( __FILE__, array( 'Timeline', 'uninstall' ) );
 add_action( 'init', array( 'Timeline', 'run' ) );
 add_action( 'admin_menu', array( 'Timeline', 'addMenus' ) );
 add_action( 'wp_ajax_get_response', array( 'Timeline', 'ajaxResponse' ) );
+add_action( 'wp_enqueue_scripts', array( 'Timeline', 'pageStyles' ) );
+add_shortcode( 'timeline', array( 'Timeline', 'doShortcode' ) );
 
 class Timeline {
 
@@ -271,7 +273,7 @@ class Timeline {
 	 */
 	public static function pageStyles()
 	{
-		wp_enqueue_style( 'timeline-admin-css', TIMELINE_PLUGIN_URI . "/styles/admin.css" );
+		wp_enqueue_style( 'timeline-css', TIMELINE_PLUGIN_URI . "/styles/timeline.css" );
 	}
 
 	/**
@@ -326,6 +328,12 @@ class Timeline {
 		}
 
 		update_option( 'timeline_option_providers', $cleaned );
+	}
+
+	public static function doShortcode()
+	{
+		$posts = TimelinePost::all();
+		require_once( 'templates/timeline.php' );
 	}
 
 	/**
