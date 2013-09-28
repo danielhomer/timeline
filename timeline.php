@@ -81,7 +81,7 @@ class Timeline {
 	}
 
 	/**
-	 * Drop the timeline table and clear our timeout transient
+	 * Drop the timeline tables and clear our timeout transient
 	 */
 	public static function uninstall()
 	{
@@ -287,8 +287,7 @@ class Timeline {
 	}
 
 	/**
-	 * Loop through the timeline submitted timeline settings and save them to
-	 * the database.
+	 * Loop through the submitted timeline settings and save them to the database
 	 * @param  array $data the submission data
 	 */
 	public static function saveSettings( $data )
@@ -332,6 +331,10 @@ class Timeline {
 		update_option( 'timeline_option_providers', $cleaned );
 	}
 
+	/**
+	* Generate the timeline for the front end using the maximum post count set on
+	* the setting page.
+	*/
 	public static function doShortcode()
 	{
 		$options = get_option( 'timeline_option_general' );
