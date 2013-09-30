@@ -1,0 +1,261 @@
+html {
+	font-family: Helvetica, arial, freesans, clean, sans-serif;
+	font-size: 0.8em;
+	color: #333;
+}
+
+#timeline {
+	width: 100%;
+	max-width: 600px;
+	margin: 20px;
+	padding: 0;
+	background: url('../images/vertical.png') 16px 0 repeat-y;
+}
+
+#timeline a, #timeline a:visited, #timeline a:active {
+	color: #333;
+}
+
+#timeline .byline a, #timeline .byline a:visited, #timeline .byline a:active {
+	color: #aaa;
+}
+
+#timeline .byline a:hover {
+	color: #333;
+}
+
+#timeline p {
+	margin: 0;
+}
+
+#timeline .latest {
+	margin-top: 0px;
+}
+
+#timeline li .right-margin p.byline {
+	margin-top: 0.7em;
+	font-size: 0.85em;
+}
+
+.timeline-item {
+	display: inline-block;
+	width: 100%;
+	clear: both;
+	margin: 10px 0;
+}
+
+.timeline-item img {
+	transition: background-color 0.3s;
+}
+
+.timeline-item .right-margin {
+	transition: border-color 0.3s;
+}
+
+.timeline-item:hover, .timeline-item:hover .right-margin {
+	cursor: default;
+}
+
+.timeline-item:hover .right-margin {
+	border-color: #ccc;
+}
+
+.timeline-item div {
+	float: left;
+}
+
+.timeline-item .left-margin {
+	width: 8%;
+	min-width: 43px;
+}
+
+.timeline-item .left-margin img {
+	width: 30px;
+	height: 30px;
+	display: block;
+	border: 3px solid #ccc;
+	border-radius: 18px;
+	background-color: #ccc;
+}
+
+.timeline-item .right-margin {
+	width: 90%;
+	padding-left: 1%;
+	border-left: 4px solid #ededed;
+}
+
+.timeline-item .byline {
+	color: #aaaaaa;
+}
+
+.timeline-item .byline .hide-button {
+	float: right;
+}
+
+.timeline-item .byline .hide-button:hover {
+	cursor: pointer;
+}
+
+.timeline-item.hidden {
+	margin: 10px 0 10px 48px;
+	opacity: 0.5;
+}
+
+.timeline-item.github:hover img {
+	background-color: #4183C4;
+}
+
+.timeline-item.facebook:hover img {
+	background-color: #3B5998;
+}
+
+.timeline-item.digg:hover img {
+	background-color: #14589E;
+}
+
+.timeline-item.blogger:hover img {
+	background-color: #F57D00;
+}
+
+.timeline-item.twitter:hover img {
+	background-color: #00ACED;
+}
+
+.timeline-item.wordpress:hover img {
+	background-color: #21759B;
+}
+
+@media all and (max-width: 530px) {
+.timeline-item .right-margin {
+	width: 75%;
+}
+}
+
+/* Admin */
+
+#container .service-box {
+	clear: both;
+}
+
+#container .service-box h3 {
+	width: auto;
+	color: #fff;
+	font-weight: normal;
+	padding: 10px;
+	margin: 0;
+}
+
+#container .service-box h3::selection {
+	background: transparent;
+}
+
+#container .service-box h3 .toggle, #container .service-box h3 #clear-log {
+	display: none;
+	font-size: 0.8em;
+	float: right;
+}
+
+#container .service-box h3 .tick, #container .service-box h3 .cross {
+	margin-right: 10px;
+}
+
+#container .service-box.disabled .tick, #container .service-box .cross {
+	display: none;
+}
+
+#container .service-box.disabled .cross {
+	display: inline-block;
+}
+
+#container .service-box p label {
+	display: inline-block;
+	width: 150px !important;
+}
+
+#container .service-box p .input-large {
+	width: 365px;
+}
+
+#container .service-box h3:hover .toggle, #container .service-box:hover #clear-log {
+	display: inline;
+}
+
+#container .service-box ul {
+	padding: 0 10px;
+}
+
+#twitter-options h3 {
+	background-color: #00ACED;
+}
+
+#facebook-options h3 {
+	background-color: #3B5998;	
+}
+
+#wordpress-options h3 {
+	background-color: #21759B;	
+}
+
+#github-options h3 {
+	background-color: #4183C4;	
+}
+
+#timeline-errors h3, #timeline-settings h3 {
+	background-color: #9E9E9E;
+}
+
+#timeline-errors ul li {
+	font-family: "Consolas", Monaco, monospace;
+}
+
+#timeline-errors ul li:hover {
+	background-color: #F8F8F8;
+}
+
+#timeline-errors ul {
+	height: 150px;
+	width: 94%;
+	overflow: scroll;
+	overflow-x: hidden;
+}
+
+#container .service-box .toggle-header:hover, #container .service-box h3 #clear-log:hover {
+	cursor: pointer;
+}
+
+#container .service-box h3 #clear-log:hover {
+	text-decoration: underline;
+}
+
+#container .service-box {
+	border: 1px solid #efefef;
+	margin-top: 10px;
+}
+
+#container .service-box p {
+	padding: 10px;
+}
+
+#container .service-box.disabled h3 {
+	background-color: #ccc !important;
+}
+
+#container .service-box.disabled p, #container .service-box.disabled ul {
+	display: none;
+}
+
+#container .service-box.half-width {
+	width: 49%;
+	min-height: 210px;
+	margin-bottom: 10px;
+}
+
+#container .service-box.half-width.left {
+	float: left;
+	clear: left;
+}
+
+#container .service-box.half-width.right {
+	float: right;
+	clear: right;
+}

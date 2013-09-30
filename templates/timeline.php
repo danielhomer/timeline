@@ -3,7 +3,7 @@
 <?php
 if ( $posts ) {
 	$i = 0;
-	foreach ( $posts as $post ) { if ( ! $post->hidden ) {
+	foreach ( $posts as $post ) {
 		if ( $post->service == 'end' ) { ?>
 			<li class="timeline-item <?php echo strtolower( $post->service ); echo $i == 0 ? ' latest' : ''; ?>">
 				<div class="left-margin"></div>
@@ -12,10 +12,10 @@ if ( $posts ) {
 			<li class="timeline-item <?php echo strtolower( $post->service ); echo $i == 0 ? ' latest' : ''; ?>">
 				<div class="left-margin"><img src="<?php echo TIMELINE_PLUGIN_URI ?>/images/<?php echo strtolower( $post->service ) ?>-32.png" alt="<?php echo $post->service ?> logo" /></div>
 				<div class="right-margin">
-					<p class="content"><a href="">Load more posts</a></p>
+					<p class="content"><a id="timeline-more">Load more posts</a></p>
 				</div>
 			</li>
-		<?php } else {
+		<?php } else if ( ! $post->hidden ) {
 		?>
 			<li class="timeline-item <?php echo strtolower( $post->service ); echo $i == 0 ? ' latest' : ''; ?>">
 				<div class="left-margin">
@@ -28,7 +28,7 @@ if ( $posts ) {
 				</div>
 			</li>
 	<?php 
-	} }
+	}
 		$i++;
 	}
 } ?>

@@ -16,7 +16,7 @@ class TimelinePost {
 		$this->posts_table = $wpdb->prefix . 'timeline';
 	}
 
-	public static function all( $start = 0, $max = false )
+	public static function all()
 	{
 		global $wpdb;
 		$posts_table = $wpdb->prefix . 'timeline';

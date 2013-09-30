@@ -24,6 +24,7 @@ add_action( 'init', array( 'Timeline', 'run' ) );
 add_action( 'admin_menu', array( 'Timeline', 'addMenus' ) );
 add_action( 'wp_ajax_get_response', array( 'Timeline', 'ajaxResponse' ) );
 add_action( 'wp_enqueue_scripts', array( 'Timeline', 'pageStyles' ) );
+add_action( 'wp_enqueue_scripts', array( 'Timeline', 'frontScripts' ) );
 add_shortcode( 'timeline', array( 'Timeline', 'doShortcode' ) );
 
 class Timeline {
@@ -157,9 +158,9 @@ class Timeline {
 		if ( ! $timeline_action )
 			$errors[] = "No action specified";
 
-		if ( ! current_user_can( 'activate_plugins' ) ) {
+		if ( $timeline_action != 'get_posts' && ! current_user_can( 'activate_plugins') ) {
 			$errors[] = "Permission denied";
-		} else if ( ! is_user_logged_in() ) {
+		} else if ( $timeline_action != 'get_posts' && ! is_user_logged_in() ) {
 			$errors[] = "User not logged in";
 		}
 
@@ -175,6 +176,11 @@ class Timeline {
 			case 'unhide_post':
 				$status = "OK";
 				$results['rows_updated'] = self::ajaxUnhide( $timeline_params );
+				break;
+
+			case 'get_posts':
+				$status = "OK";
+				$results['posts'] = self::ajaxGetPosts( $timeline_params );
 				break;
 
 			case 'clear_error_log':
@@ -242,6 +248,24 @@ class Timeline {
 	}
 
 	/**
+	 * Get the next batch of timeline posts
+	 * @param  array $params The offset parameters
+	 * @return array         The posts
+	 */
+	public static function ajaxGetPosts( $params )
+	{
+		if ( ! is_array( $params ) || ! array_key_exists( 'start', $params ) )
+			return false;
+
+		$start = $params['start'];
+		$options = get_option( 'timeline_option_general' );
+
+		if ( $start === 0 ) $start = $options['max_posts'];
+
+		return TimelinePost::inBounds( $start, $start + 10 );
+	}
+
+	/**
 	 * Hooked into admin_menu - add the plugin menu items the the WordPress backend
 	 */
 	public static function addMenus()
@@ -276,6 +300,11 @@ class Timeline {
 	public static function pageStyles()
 	{
 		wp_enqueue_style( 'timeline-css', TIMELINE_PLUGIN_URI . "/styles/timeline.css" );
+	}
+
+	public static function frontScripts()
+	{
+		wp_enqueue_script( 'timeline-front-scripts', TIMELINE_PLUGIN_URI . "/scripts/timeline.js", array( 'jquery' ), '0.1' );
 	}
 
 	/**
