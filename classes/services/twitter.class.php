@@ -9,6 +9,10 @@ class Twitter extends TimelineService {
 	public $access_token_secret;
 	public $host = "https://api.twitter.com/1.1/";
 
+	/**
+	 * Construct the parent and retrieve the provider-specific 
+	 * options from the database.
+	 */
 	public function __construct()
 	{
 		parent::__construct();
@@ -29,6 +33,11 @@ class Twitter extends TimelineService {
 	    }
 	}
 
+	/**
+	 * Iterate over the data we've recieved from the external
+	 * source. If we haven't already got a record of it in the
+	 * timeline posts table, add it in.
+	 */
 	public function sync()
 	{
 		$tweets = $this->get('statuses/user_timeline', array( 'screen_name' => $this->username ) );
@@ -62,6 +71,12 @@ class Twitter extends TimelineService {
 		}
 	}
 
+	/**
+	 * Retrieve the data from the external service
+	 * @param  string $url        URL of the API
+	 * @param  string $parameters The parameters to pass to the API
+	 * @return object             The decoded JSON response
+	 */
 	public function get( $url, $parameters )
 	{
 		$response = $this->oAuthRequest( $url, 'GET', $parameters );
