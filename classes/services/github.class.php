@@ -6,6 +6,10 @@ class GitHub extends TimelineService {
 	public $url = 'https://api.github.com/';
 	public $home_url = 'https://github.com/';
 
+	/**
+	 * Construct the parent and retrieve the provider-specific 
+	 * options from the database.
+	 */
 	public function __construct()
 	{
 		parent::__construct();
@@ -14,6 +18,11 @@ class GitHub extends TimelineService {
 		$this->username = $options['username'];
 	}
 
+	/**
+	 * Iterate over the data we've recieved from the external
+	 * source. If we haven't already got a record of it in the
+	 * timeline posts table, add it in.
+	 */
 	public function sync()
 	{
 		$events = $this->get( $this->url, $this->username );
@@ -47,6 +56,12 @@ class GitHub extends TimelineService {
 		}
 	}
 
+	/**
+	 * Retrieve the data from the external service
+	 * @param  string $url      URL of the API
+	 * @param  string $username The username to retrieve info for
+	 * @return object           The decoded JSON response
+	 */
 	private function get( $url, $username )
 	{
 		$response = $this->http( $url . 'users/' . $username . '/events/public', 'GET' );
@@ -58,6 +73,12 @@ class GitHub extends TimelineService {
 		return $response;
 	}
 
+	/**
+	 * Parse the event object, detect it's type and format it
+	 * into a pretty sentence.
+	 * @param  object $event The object to parse
+	 * @return string        The pretty sentence
+	 */
 	private function getContent( $event )
 	{
 		switch( $event->type ) {
