@@ -7,8 +7,7 @@ class GitHub extends TimelineService {
 	public $home_url = 'https://github.com/';
 
 	/**
-	 * Construct the parent and retrieve the provider-specific 
-	 * options from the database.
+	 * Construct the parent and retrieve the provider-specific options from the database.
 	 */
 	public function __construct()
 	{
@@ -19,8 +18,7 @@ class GitHub extends TimelineService {
 	}
 
 	/**
-	 * Iterate over the data we've recieved from the external
-	 * source. If we haven't already got a record of it in the
+	 * Iterate over the data we've recieved from the external source. If we haven't already got a record of it in the
 	 * timeline posts table, add it in.
 	 */
 	public function sync()
@@ -74,8 +72,7 @@ class GitHub extends TimelineService {
 	}
 
 	/**
-	 * Parse the event object, detect it's type and format it
-	 * into a pretty sentence.
+	 * Parse the event object, detect it's type and format it into a pretty sentence.
 	 * @param  object $event The object to parse
 	 * @return string        The pretty sentence
 	 */

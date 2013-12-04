@@ -34,9 +34,8 @@ class Twitter extends TimelineService {
 	}
 
 	/**
-	 * Iterate over the data we've recieved from the external
-	 * source. If we haven't already got a record of it in the
-	 * timeline posts table, add it in.
+	 * Iterate over the data we've recieved from the external source. If we haven't already 
+	 * got a record of it in the timeline posts table, add it in.
 	 */
 	public function sync()
 	{

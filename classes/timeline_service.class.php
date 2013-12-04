@@ -8,11 +8,15 @@ class TimelineService {
 	protected $timeout = 30;
 	protected $connecttimeout = 30;
 	protected $useragent = 'Timeline Plugin for WordPress';
+	protected $http_header = array();
 	protected $ssl_verifypeer = FALSE;
 	protected $format = 'json';
 	protected $decode_json = TRUE;
 	protected $service_ids = array();
 
+	/**
+	 * Construct the service object, get the service ids from the database
+	 */
 	public function __construct()
 	{
 		global $wpdb;
@@ -20,6 +24,13 @@ class TimelineService {
 		$this->service_ids = $wpdb->get_col( "SELECT service_id FROM $posts_table" );
 	}
 
+	/**
+	 * Create a HTTP request with the passed URL, method and fields
+	 * @param  string $url        The URL to run the request against
+	 * @param  string $method     The HTTP method (i.e. POST, GET, UPDATE etc.)
+	 * @param  array  $postfields The parameters to send with the request
+	 * @return mixed  						The response
+	 */
 	protected function http( $url, $method, $postfields = NULL )
 	{
 		$this->http_info = array();
@@ -57,19 +68,32 @@ class TimelineService {
 		return $response;
 	}
 
+	/**
+	 * Add the headers to the http_headers array
+	 * @param  object $ch     The cURL resource
+	 * @param  string $header The header data
+	 * @return int            The header length
+	 */
 	protected function getHeader( $ch, $header )
 	{
-		$i = strpos( $header, ':' );
+		$i = strpos( $header, ':' ); // Check for the header key
 		
 		if ( ! empty( $i ) ) {
-			$key = str_replace( '-', '_', strtolower( substr( $header, 0, $i ) ) );
-			$value = trim( substr( $header, $i + 2 ) );
-			$this->http_header[ $key ] = $value;
+			$key = str_replace( '-', '_', strtolower( substr( $header, 0, $i ) ) ); // Replace all dashes with underscores, convert the key to lowercase
+			$value = trim( substr( $header, $i + 2 ) ); // Remove whitespace after the key
+			$this->http_header[ $key ] = $value; // Add the header key => value to the object http_headers array
 		}
 
-		return strlen( $header );
+		return strlen( $header ); // Return the header length
 	}
 
+	/**
+	 * Prepare a HTTP request using oAuth for authentication
+	 * @param  string $url        The URL to run the request against
+	 * @param  string $method     The HTTP method (i.e. POST, GET, UPDATE etc.)
+	 * @param  array  $parameters The parameters to send with the request
+	 * @return mixed  						The response
+	 */
 	protected function oAuthRequest( $url, $method, $parameters )
 	{
 		if ( strrpos( $url, 'https://' ) !== 0 && strrpos( $url, 'http://' ) !== 0 )
